@@ -10,13 +10,29 @@ import UIKit
 
 class TodoTableViewController: UITableViewController {
 	
-	var todos: [Todo] = []
+	var todos: [TodoEntity] = []
 	var position: Int = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
-		
     }
+	
+	override func viewWillAppear(_ animated: Bool) {
+		getTodos()
+	}
+	
+	func getTodos() {
+		if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+			
+			if let fetchTodos = try? context.fetch(TodoEntity.fetchRequest()) as? [TodoEntity] {
+				if let todoList = fetchTodos {
+					todos = todoList
+					tableView.reloadData()
+				}
+			}
+			
+		}
+	}
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -34,16 +50,20 @@ class TodoTableViewController: UITableViewController {
 		
 		let todo = todos[indexPath.row]
 		
-		if todo.isImportant
-		{
-			cell.textLabel?.text = "❗️ \(todo.name)"
-			cell.textLabel?.textColor = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
+		if let todoName = todo.name {
+			if todo.isImportant
+			{
+				cell.textLabel?.text =  "❗️" + todoName
+				cell.textLabel?.textColor = #colorLiteral(red: 0.7450980544, green: 0.1568627506, blue: 0.07450980693, alpha: 1)
+			}
+			else
+			{
+				cell.textLabel?.text = todo.name
+				cell.textLabel?.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+			}
 		}
-		else
-		{
-			cell.textLabel?.text = todo.name
-			cell.textLabel?.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-		}
+		
+		
 
         return cell
     }
@@ -64,7 +84,9 @@ class TodoTableViewController: UITableViewController {
 		if let showVC = segue.destination as? ShowTodoViewController {
 		
 			
-			if let todo = sender as? Todo {
+			if let todo = sender as? TodoEntity {
+				
+				
 				showVC.selectedTodo = todo
 				showVC.refVC = self
 			}

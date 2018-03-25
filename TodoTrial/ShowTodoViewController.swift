@@ -12,17 +12,24 @@ class ShowTodoViewController: UIViewController {
 
 	@IBOutlet weak var todoLabel: UILabel!
 	var refVC =  TodoTableViewController()
-	var selectedTodo =  Todo()
+	var selectedTodo: TodoEntity?
 	var selectedTodoPosition: Int = 0
 	
 	override func viewDidLoad() {
         super.viewDidLoad()
 
-        todoLabel.text = selectedTodo.name
+        todoLabel.text = selectedTodo?.name
 		selectedTodoPosition = refVC.position
     }
 	@IBAction func tappedDoneBtn(_ sender: UIButton) {
-		refVC.todos.remove(at: selectedTodoPosition)
+		
+		if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+			if let todoItem = selectedTodo {
+				context.delete(todoItem)
+			}
+			
+		}
+		
 		refVC.tableView.reloadData()
 		navigationController?.popViewController(animated: true)
 	}

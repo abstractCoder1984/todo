@@ -32,8 +32,9 @@ class AddTodoViewController: UIViewController {
     }
 
 	@IBAction func tappedAddButton(_ sender: UIButton) {
-		
 		let withImportance = isImportantSwitch.isOn
+		/*
+		
 		let todo = Todo()
 		
 		if let title = input.text {
@@ -47,13 +48,22 @@ class AddTodoViewController: UIViewController {
 		navigationController?.popViewController(animated: true)
 		
 		print(todoRefVC.todos)
+		*/
+		
+		if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext {
+			let todo = TodoEntity.init(entity: TodoEntity.entity(), insertInto: context)
+			
+			if let title = input.text {
+				todo.name = title
+				todo.isImportant = withImportance
+			}
+			try? context.save()
+			navigationController?.popViewController(animated: true)
+		}
+		
+		
 		
 		
 	}
 	
-	
-	override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
 }
